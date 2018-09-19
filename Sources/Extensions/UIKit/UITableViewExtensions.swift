@@ -10,7 +10,7 @@
 import UIKit
 
 // MARK: - Properties
-public extension UITableView {
+@objc public extension UITableView {
 
 	/// SwifterSwift: Index path of last row in tableView.
 	public var indexPathForLastRow: IndexPath? {
@@ -191,6 +191,19 @@ public extension UITableView {
 		guard indexPath.row < numberOfRows(inSection: indexPath.section) else { return }
 		scrollToRow(at: indexPath, at: scrollPosition, animated: animated)
 	}
+    
+    // wrap to support new api
+    @objc public func safePerformBatchUpdates( _ updateCallBack: (()->()) , completon completionCallback : @escaping ((Bool)->())){
+        if #available(iOS 11.0, *) {
+            self.performBatchUpdates( updateCallBack, completion: completionCallback)
+        } else {
+            // Fallback on earlier versions
+            self.beginUpdates()
+            updateCallBack()
+            self.endUpdates()
+            completionCallback(true)
+        }
+    }
 
 }
 #endif
